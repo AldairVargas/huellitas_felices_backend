@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -66,5 +67,59 @@ public class PetService {
 
         pet.setEstado(nuevoEstado);
         return petRepository.save(pet);
+    }
+
+    public List<Pet> getAllPets(String categoria, String estado, String raza) {
+        List<Pet> pets = petRepository.findAll();
+        
+        if (categoria != null && !categoria.isEmpty()) {
+            pets = pets.stream()
+                    .filter(pet -> pet.getCategoria().getNombre().equalsIgnoreCase(categoria))
+                    .collect(Collectors.toList());
+        }
+        
+        if (estado != null && !estado.isEmpty()) {
+            pets = pets.stream()
+                    .filter(pet -> pet.getEstado().name().equalsIgnoreCase(estado))
+                    .collect(Collectors.toList());
+        }
+        
+        if (raza != null && !raza.isEmpty()) {
+            pets = pets.stream()
+                    .filter(pet -> pet.getRaza().toLowerCase().contains(raza.toLowerCase()))
+                    .collect(Collectors.toList());
+        }
+        
+        return pets;
+    }
+
+    @Transactional
+    public Pet updatePet(Long id, PetStatusUpdateDTO dto) {
+        Pet pet = petRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
+
+        PetStatus nuevoEstado = PetStatus.valueOf(dto.getNuevoEstado());
+
+        if (nuevoEstado == PetStatus.EN_PROCESO_ADOPCION || nuevoEstado == PetStatus.ADOPTADO) {
+            if (dto.getAdoptadorId() != null) {
+                Adopter adoptador = adopterRepository.findById(dto.getAdoptadorId())
+                        .orElseThrow(() -> new RuntimeException("Adoptador no encontrado"));
+                pet.setAdoptador(adoptador);
+            }
+            if (nuevoEstado == PetStatus.ADOPTADO) {
+                pet.setFechaAdopcion(LocalDate.now());
+            }
+        } else {
+            pet.setAdoptador(null);
+            pet.setFechaAdopcion(null);
+        }
+
+        pet.setEstado(nuevoEstado);
+        return petRepository.save(pet);
+    }
+
+    public Pet getPetById(Long id) {
+        return petRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
     }
 }
