@@ -15,8 +15,21 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
 
+    public List<Category> getAllCategories() {
+        return categoryRepository.findAll();
+    }
+
     public List<Category> getAll() {
         return categoryRepository.findAll();
+    }
+
+    @Transactional
+    public Category createCategory(CategoryDTO dto) {
+        if (categoryRepository.findByNombre(dto.getNombre()).isPresent()) {
+            throw new RuntimeException("La categoría ya existe");
+        }
+        Category category = Category.builder().nombre(dto.getNombre()).build();
+        return categoryRepository.save(category);
     }
 
     @Transactional

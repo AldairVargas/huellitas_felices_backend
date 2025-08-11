@@ -57,7 +57,11 @@ public class JwtUtil {
         return exp.before(new Date());
     }
 
-    public Authentication getAuthentication(UserDetails user) {
-        return new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+    public UsernamePasswordAuthenticationToken getAuthentication(UserDetails userDetails) {
+        return new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
     }
 }
