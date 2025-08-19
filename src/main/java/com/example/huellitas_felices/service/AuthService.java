@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -111,5 +112,28 @@ public class AuthService {
                 claims
         );
         return new JwtResponseDTO(token, user.getRol().getNombre(), user.getNombre());
+    }
+
+    public UserProfileDTO getCurrentUserProfile(String correo) {
+        User user = userRepository.findByCorreo(correo)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Verificar si es adoptador para obtener información adicional
+        Optional<Adopter> adopter = adopterRepository.findByUserCorreo(correo);
+        
+        UserProfileDTO.UserProfileDTOBuilder profileBuilder = UserProfileDTO.builder()
+                .id(user.getId())
+                .nombre(user.getNombre())
+                .correo(user.getCorreo())
+                .rol(user.getRol());
+
+        // Si es adoptador, agregar telefono y direccion
+        if (adopter.isPresent()) {
+            profileBuilder
+                    .telefono(adopter.get().getTelefono())
+                    .direccion(adopter.get().getDireccion());
+        }
+
+        return profileBuilder.build();
     }
 }

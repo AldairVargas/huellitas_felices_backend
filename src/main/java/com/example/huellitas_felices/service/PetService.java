@@ -101,11 +101,12 @@ public class PetService {
         PetStatus nuevoEstado = PetStatus.valueOf(dto.getNuevoEstado());
 
         if (nuevoEstado == PetStatus.EN_PROCESO_ADOPCION || nuevoEstado == PetStatus.ADOPTADO) {
-            if (dto.getAdoptadorId() != null) {
-                Adopter adoptador = adopterRepository.findById(dto.getAdoptadorId())
-                        .orElseThrow(() -> new RuntimeException("Adoptador no encontrado"));
-                pet.setAdoptador(adoptador);
+            if (dto.getAdoptadorId() == null) {
+                throw new RuntimeException("Se requiere un adoptador para el estado: " + nuevoEstado);
             }
+            Adopter adoptador = adopterRepository.findById(dto.getAdoptadorId())
+                    .orElseThrow(() -> new RuntimeException("Adoptador no encontrado"));
+            pet.setAdoptador(adoptador);
             if (nuevoEstado == PetStatus.ADOPTADO) {
                 pet.setFechaAdopcion(LocalDate.now());
             }

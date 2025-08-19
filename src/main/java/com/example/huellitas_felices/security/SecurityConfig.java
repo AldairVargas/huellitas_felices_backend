@@ -35,7 +35,7 @@ package com.example.huellitas_felices.security;
                         .csrf(csrf -> csrf.disable())
                         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                         .authorizeHttpRequests(auth -> auth
-                            .requestMatchers("/v3/api-docs/**","/swagger-ui/**","/swagger-ui.html","/auth/**").permitAll()
+                            .requestMatchers("/v3/api-docs/**","/swagger-ui/**","/swagger-ui.html","/auth/login","/auth/register/adopter").permitAll()
                             .requestMatchers(HttpMethod.GET, "/pets/**").permitAll()
                             .anyRequest().authenticated()
                         )
@@ -51,8 +51,10 @@ package com.example.huellitas_felices.security;
                     configuration.setAllowedOrigins(Arrays.asList(
                         "http://localhost:3000",
                         "http://localhost:5173",
+                        "http://localhost:5174",
                         "http://127.0.0.1:5173",
-                        "http://127.0.0.1:3000"
+                        "http://127.0.0.1:3000",
+                        "http://127.0.0.1:5174"
                     ));
                     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
                     configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Origin", "Accept"));
