@@ -35,6 +35,7 @@ public class PetService {
                 .peso(dto.getPeso())
                 .estatura(dto.getEstatura())
                 .descripcion(dto.getDescripcion())
+                .img(dto.getImg())
                 .fechaIngreso(LocalDate.now())
                 .estado(PetStatus.DISPONIBLE)
                 .build();
@@ -71,25 +72,25 @@ public class PetService {
 
     public List<Pet> getAllPets(String categoria, String estado, String raza) {
         List<Pet> pets = petRepository.findAll();
-        
+
         if (categoria != null && !categoria.isEmpty()) {
             pets = pets.stream()
                     .filter(pet -> pet.getCategoria().getNombre().equalsIgnoreCase(categoria))
                     .collect(Collectors.toList());
         }
-        
+
         if (estado != null && !estado.isEmpty()) {
             pets = pets.stream()
                     .filter(pet -> pet.getEstado().name().equalsIgnoreCase(estado))
                     .collect(Collectors.toList());
         }
-        
+
         if (raza != null && !raza.isEmpty()) {
             pets = pets.stream()
                     .filter(pet -> pet.getRaza().toLowerCase().contains(raza.toLowerCase()))
                     .collect(Collectors.toList());
         }
-        
+
         return pets;
     }
 

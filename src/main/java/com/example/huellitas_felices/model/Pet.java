@@ -8,9 +8,13 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "pets")
-@Data @NoArgsConstructor @AllArgsConstructor @Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Pet {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -34,6 +38,9 @@ public class Pet {
 
     @Column(nullable = false, length = 350)
     private String descripcion;
+
+    @Column(length = 500)
+    private String img; // URL o ruta de la imagen de la mascota
 
     @Column(nullable = false)
     private LocalDate fechaIngreso;
