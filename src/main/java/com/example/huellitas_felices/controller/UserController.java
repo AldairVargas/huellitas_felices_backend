@@ -1,6 +1,7 @@
 package com.example.huellitas_felices.controller;
 
 import com.example.huellitas_felices.dto.UserRegisterDTO;
+import com.example.huellitas_felices.dto.UserUpdateDTO;
 import com.example.huellitas_felices.model.User;
 import com.example.huellitas_felices.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -106,5 +107,117 @@ public class UserController {
     })
     public ResponseEntity<User> createEmployee(@Valid @RequestBody UserRegisterDTO dto) {
         return ResponseEntity.ok(userService.createEmployee(dto));
+    }
+
+    @PutMapping("/{userId}")
+    @PreAuthorize("hasRole('SUPERADMIN')")
+    @Operation(summary = "Actualizar usuario", description = "Actualiza los datos básicos de un usuario existente")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Usuario actualizado exitosamente",
+                    content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Error en los datos proporcionados",
+                    content = {
+                            @Content(mediaType = "application/json")
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "No autorizado - Token inválido",
+                    content = {
+                            @Content(mediaType = "application/json")
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Prohibido - Se requiere rol SUPERADMIN",
+                    content = {
+                            @Content(mediaType = "application/json")
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuario no encontrado",
+                    content = {
+                            @Content(mediaType = "application/json")
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Error interno del servidor",
+                    content = {
+                            @Content(mediaType = "application/json")
+                    }
+            )
+    })
+    public ResponseEntity<User> updateUser(@PathVariable Long userId, @Valid @RequestBody UserUpdateDTO dto) {
+        try {
+            User updatedUser = userService.updateUser(userId, dto);
+            return ResponseEntity.ok(updatedUser);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/{userId}")
+    @PreAuthorize("hasRole('SUPERADMIN')")
+    @Operation(summary = "Eliminar empleado", description = "Elimina un empleado del sistema (no permite eliminar adoptadores ni superadmin)")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Empleado eliminado exitosamente",
+                    content = {
+                            @Content(mediaType = "application/json")
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Error - No se puede eliminar adoptador o superadmin",
+                    content = {
+                            @Content(mediaType = "application/json")
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "No autorizado - Token inválido",
+                    content = {
+                            @Content(mediaType = "application/json")
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Prohibido - Se requiere rol SUPERADMIN",
+                    content = {
+                            @Content(mediaType = "application/json")
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuario no encontrado",
+                    content = {
+                            @Content(mediaType = "application/json")
+                    }
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Error interno del servidor",
+                    content = {
+                            @Content(mediaType = "application/json")
+                    }
+            )
+    })
+    public ResponseEntity<Void> deleteEmployee(@PathVariable Long userId) {
+        try {
+            userService.deleteEmployee(userId);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

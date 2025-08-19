@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface AdopterRepository extends JpaRepository<Adopter, Long> {
     Optional<Adopter> findByUserId(Long userId);
     Optional<Adopter> findByUser(User user);
+    Optional<Adopter> findByUserCorreo(String correo);
 }
